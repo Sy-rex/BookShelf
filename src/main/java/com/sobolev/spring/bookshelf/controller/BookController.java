@@ -47,13 +47,20 @@ public class BookController {
     @PutMapping("/{id}")
     public ResponseEntity<BookResponse> updateBook(@PathVariable Long id,
                                                    @Valid @RequestBody BookRequest bookRequest){
-        BookResponse book = bookService.update(id, bookRequest);
-        return new ResponseEntity<>(book, HttpStatus.OK);
+        Optional<BookResponse> book = bookService.update(id, bookRequest);
+        if (book.isPresent()){
+            return new ResponseEntity<>(book.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id){
-        bookService.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        boolean deleted = bookService.deleteById(id);
+
+        if (deleted){
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

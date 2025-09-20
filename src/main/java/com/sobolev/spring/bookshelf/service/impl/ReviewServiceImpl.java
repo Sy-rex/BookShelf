@@ -38,6 +38,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReviewResponse> findAll() {
         return reviewRepository.findAll()
                 .stream()
@@ -46,11 +47,13 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<ReviewResponse> findById(Long id) {
         return reviewRepository.findById(id).map(reviewMapper::toResponse);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReviewResponse> findByBookId(Long bookId) {
         return reviewRepository.findByBookId(bookId)
                 .stream()

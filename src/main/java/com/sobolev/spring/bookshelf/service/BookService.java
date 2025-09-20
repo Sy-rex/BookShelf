@@ -10,6 +10,6 @@ public interface BookService {
     List<BookResponse> findAll();
     Optional<BookResponse> findById(Long id);
     BookResponse create(BookRequest bookRequest);
-    BookResponse update(Long id, BookRequest bookRequest);
-    void deleteById(Long id);
+    Optional<BookResponse> update(Long id, BookRequest bookRequest);
+    boolean deleteById(Long id);
 }

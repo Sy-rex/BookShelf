@@ -27,4 +27,6 @@ public class BookRequest {
 
     @NotNull(message = "message is required")
     private BookStatus status;
+
+    private Set<Long> genreIds;
 }

@@ -15,4 +15,7 @@ public class BookResponse {
     private String isbn;
     private Integer publicationYear;
     private BookStatus status;
+    private Set<GenreResponse> genres;
+    private Integer reviewCount;
+    private Double averageRating;
 }

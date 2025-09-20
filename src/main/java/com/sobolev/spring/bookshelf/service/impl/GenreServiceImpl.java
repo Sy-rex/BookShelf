@@ -29,6 +29,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<GenreResponse> findAll() {
         return genreRepository.findAll()
                 .stream()
@@ -37,6 +38,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public GenreResponse findById(Long id) {
         Genre genre = genreRepository.findById(id)
                 .orElseThrow(() -> new NotFoundGenreException("Genre not found with id: " + id));
@@ -44,6 +46,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public GenreResponse findByName(String name) {
         Genre genre = genreRepository.findByName(name)
                 .orElseThrow(() -> new NotFoundGenreException("Genre not found with name: " + name));
