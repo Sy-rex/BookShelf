@@ -1,5 +1,6 @@
 package com.sobolev.spring.bookshelf.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -9,8 +10,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@Schema(description = "review dto")
 public class ReviewRequest {
     @NotNull(message = "Book ID is required")
+    @Schema(description = "Type Long")
     private Long bookId;
 
     private String content;

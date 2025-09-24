@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface GenreService {
     List<GenreResponse> findAll();
-    GenreResponse findById(Long id);
-    GenreResponse findByName(String name);
+    Optional<GenreResponse> findById(Long id);
+    Optional<GenreResponse> findByName(String name);
     GenreResponse create(GenreRequest genreRequest);
-    GenreResponse update(Long id, GenreRequest genreRequest);
+    Optional<GenreResponse> update(Long id, GenreRequest genreRequest);
     boolean deleteById(Long id);
 }

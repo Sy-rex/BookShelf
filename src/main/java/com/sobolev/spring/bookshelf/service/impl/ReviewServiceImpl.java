@@ -10,6 +10,7 @@ import com.sobolev.spring.bookshelf.service.BookService;
 import com.sobolev.spring.bookshelf.service.ReviewService;
 import com.sobolev.spring.bookshelf.util.BookMapper;
 import com.sobolev.spring.bookshelf.util.ReviewMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@Slf4j
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -40,6 +42,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional(readOnly = true)
     public List<ReviewResponse> findAll() {
+        log.info("Start Finding all reviews");
         return reviewRepository.findAll()
                 .stream()
                 .map(reviewMapper::toResponse)
@@ -49,12 +52,14 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional(readOnly = true)
     public Optional<ReviewResponse> findById(Long id) {
+        log.info("Start Finding review by id: {}", id);
         return reviewRepository.findById(id).map(reviewMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ReviewResponse> findByBookId(Long bookId) {
+        log.info("Start Finding reviews by book id: {}", bookId);
         return reviewRepository.findByBookId(bookId)
                 .stream()
                 .map(reviewMapper::toResponse)
@@ -63,8 +68,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ReviewResponse create(ReviewRequest reviewRequest) {
+        log.info("Start Creating review: {}", reviewRequest);
         Optional<BookResponse> bookResponse = bookService.findById(reviewRequest.getBookId());
         if (bookResponse.isEmpty()) {
+            log.error("Book not found");
             throw new RuntimeException("Book not found with id " + reviewRequest.getBookId());
         }
 
@@ -75,11 +82,14 @@ public class ReviewServiceImpl implements ReviewService {
         review.setBook(book);
 
         Review savedReview = reviewRepository.save(review);
+        log.info("End Creating review");
+
         return reviewMapper.toResponse(savedReview);
     }
 
     @Override
     public Optional<ReviewResponse> update(Long id, ReviewRequest reviewRequest) {
+        log.info("Start Updating review: {}", reviewRequest);
         return reviewRepository.findById(id)
                 .map(existingReview -> {
                     reviewMapper.updateEntityFromRequest(reviewRequest, existingReview);
@@ -88,6 +98,7 @@ public class ReviewServiceImpl implements ReviewService {
                         Optional<BookResponse> bookResponse = bookService.findById(reviewRequest.getBookId());
 
                         if (bookResponse.isEmpty()) {
+                            log.error("Book not found");
                             throw new RuntimeException("Book not found with id " + reviewRequest.getBookId());
                         }
 
@@ -97,6 +108,7 @@ public class ReviewServiceImpl implements ReviewService {
                     }
 
                     Review updatedReview = reviewRepository.save(existingReview);
+                    log.info("End Updating review");
                     return reviewMapper.toResponse(updatedReview);
                 });
     }
@@ -104,9 +116,11 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public boolean deleteById(Long id) {
         if (reviewRepository.existsById(id)) {
+            log.info("Start Deleting review by id: {}", id);
             reviewRepository.deleteById(id);
             return true;
         }
+        log.info("not found review by id: {}", id);
         return false;
     }
 }

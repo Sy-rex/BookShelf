@@ -7,6 +7,7 @@ import com.sobolev.spring.bookshelf.model.Genre;
 import com.sobolev.spring.bookshelf.repository.GenreRepository;
 import com.sobolev.spring.bookshelf.service.GenreService;
 import com.sobolev.spring.bookshelf.util.GenreMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@Slf4j
 public class GenreServiceImpl implements GenreService {
 
     private final GenreRepository genreRepository;
@@ -31,6 +33,7 @@ public class GenreServiceImpl implements GenreService {
     @Override
     @Transactional(readOnly = true)
     public List<GenreResponse> findAll() {
+        log.info("Start find all genres");
         return genreRepository.findAll()
                 .stream()
                 .map(genreMapper::toResponse)
@@ -39,44 +42,47 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     @Transactional(readOnly = true)
-    public GenreResponse findById(Long id) {
-        Genre genre = genreRepository.findById(id)
-                .orElseThrow(() -> new NotFoundGenreException("Genre not found with id: " + id));
-        return genreMapper.toResponse(genre);
+    public Optional<GenreResponse> findById(Long id) {
+        log.info("Start find genre by id");
+        return genreRepository.findById(id).map(genreMapper::toResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public GenreResponse findByName(String name) {
-        Genre genre = genreRepository.findByName(name)
-                .orElseThrow(() -> new NotFoundGenreException("Genre not found with name: " + name));
-
-        return genreMapper.toResponse(genre);
+    public Optional<GenreResponse> findByName(String name) {
+        log.info("Start find genre by name: {}", name);
+        return genreRepository.findByName(name).map(genreMapper::toResponse);
     }
 
     @Override
     public GenreResponse create(GenreRequest genreRequest) {
+        log.info("Start create genre");
         Genre genre = genreMapper.toEntity(genreRequest);
         Genre savedGenre = genreRepository.save(genre);
+        log.info("End create genre");
         return genreMapper.toResponse(savedGenre);
     }
 
     @Override
-    public GenreResponse update(Long id, GenreRequest genreRequest) {
+    public Optional<GenreResponse> update(Long id, GenreRequest genreRequest) {
+        log.info("Start update genre");
         return genreRepository.findById(id)
                 .map(existingGenre -> {
                     genreMapper.updateEntityFromRequest(genreRequest, existingGenre);
                     Genre updatedGenre = genreRepository.save(existingGenre);
+                    log.info("End update genre");
                     return genreMapper.toResponse(updatedGenre);
-                }).orElseThrow(() -> new NotFoundGenreException("Genre not found with id: " + id));
+                });
     }
 
     @Override
     public boolean deleteById(Long id) {
         if (genreRepository.existsById(id)) {
+            log.info("delete genre by id");
             genreRepository.deleteById(id);
             return true;
         }
+        log.info("not found genre by id");
         return false;
     }
 }
