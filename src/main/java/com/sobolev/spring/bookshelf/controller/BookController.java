@@ -2,6 +2,8 @@ package com.sobolev.spring.bookshelf.controller;
 
 import com.sobolev.spring.bookshelf.dto.request.BookRequest;
 import com.sobolev.spring.bookshelf.dto.response.BookResponse;
+import com.sobolev.spring.bookshelf.model.Book;
+import com.sobolev.spring.bookshelf.model.BookStatus;
 import com.sobolev.spring.bookshelf.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -105,5 +108,97 @@ public class BookController {
         }
         log.info("Not found book deleted");
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/author/{author}")
+    @Operation(
+            summary = "Get books by author",
+            description = "Return book by author"
+    )
+    public ResponseEntity<List<BookResponse>> getBooksByAuthor(@PathVariable String author){
+        List<BookResponse> books = bookService.findByAuthor(author);
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/status/{status}")
+    @Operation(
+            summary = "Get books by status",
+            description = "Return book by status"
+    )
+    public ResponseEntity<List<BookResponse>> getBooksByStatus(@PathVariable BookStatus status){
+        List<BookResponse> books = bookService.findByStatus(status);
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/year/{year}")
+    @Operation(
+            summary = "Get books by publicationYear",
+            description = "Return book by publicationYear"
+    )
+    public ResponseEntity<List<BookResponse>> getBooksByPublicationYear(@PathVariable Integer year){
+        List<BookResponse> books = bookService.findByPublicationYear(year);
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/year-range")
+    @Operation(
+            summary = "Get books by year range",
+            description = "Return books where publicationYear between startYear and endYear"
+    )
+    public ResponseEntity<List<BookResponse>> getBooksByYearRange(
+            @RequestParam Integer startYear,
+            @RequestParam Integer endYear){
+        List<BookResponse> books = bookService.findByPublicationYearBetween(startYear, endYear);
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/genre/{genreId}")
+    @Operation(
+            summary = "Get books by genreId",
+            description = "Return books by genreId"
+    )
+    public ResponseEntity<List<BookResponse>> getBooksByGenre(@PathVariable Long genreId){
+        List<BookResponse> books = bookService.findBooksByGenreId(genreId);
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/genre-name/{genreName}")
+    @Operation(
+            summary = "Get books by genreName",
+            description = "Return books by genreName"
+    )
+    public ResponseEntity<List<BookResponse>> getBooksByGenreName(@PathVariable String genreName){
+        List<BookResponse> books = bookService.findBooksByGenreName(genreName);
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/popular")
+    @Operation(
+            summary = "Get popular books",
+            description = "Return popular books sorted by rating"
+    )
+    public ResponseEntity<List<BookResponse>> getPopularBooks(){
+        List<BookResponse> books = bookService.findPopularBooks();
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/high-rated")
+    @Operation(
+            summary = "Get books with higher rating",
+            description = "Return books with average rating grater when minRating"
+    )
+    public ResponseEntity<List<BookResponse>> getHighRatedBooks(
+            @RequestParam(defaultValue = "4.0") Double minRating){
+        List<BookResponse> books = bookService.findBooksWithAverageRatingAbove(minRating);
+        return ResponseEntity.ok(books);
+    }
+
+    @GetMapping("/stats/author/{author}")
+    @Operation(
+            summary = "Get count books by author"
+    )
+    public ResponseEntity<Long> getBookCountByAuthor(@PathVariable String author){
+        long bookCount = bookService.countByAuthor(author);
+        return ResponseEntity.ok(bookCount);
     }
 }

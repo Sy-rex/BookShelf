@@ -4,17 +4,16 @@ import com.sobolev.spring.bookshelf.dto.request.BookRequest;
 import com.sobolev.spring.bookshelf.dto.response.BookResponse;
 import com.sobolev.spring.bookshelf.exception.ResourseNotFoundException;
 import com.sobolev.spring.bookshelf.model.Book;
+import com.sobolev.spring.bookshelf.model.BookStatus;
 import com.sobolev.spring.bookshelf.model.Genre;
 import com.sobolev.spring.bookshelf.repository.BookRepository;
 import com.sobolev.spring.bookshelf.repository.GenreRepository;
 import com.sobolev.spring.bookshelf.service.BookService;
-import com.sobolev.spring.bookshelf.service.GenreService;
 import com.sobolev.spring.bookshelf.util.BookMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +58,7 @@ public class BookServiceImpl implements BookService {
     public BookResponse create(BookRequest bookRequest) {
         log.info("Start create in service");
         Book book = bookMapper.toEntity(bookRequest);
-        log.info("successful mapping to book");
+        log.info("successful mapping to book in create");
         if (bookRequest.getGenreIds() != null && !bookRequest.getGenreIds().isEmpty()) {
             long existingGenresCount = genreRepository.countByIdIn(bookRequest.getGenreIds());
             log.info("existingGenresCount: {}", existingGenresCount);
@@ -90,7 +89,7 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findById(id)
                 .map(existingBook -> {
                     bookMapper.updateEntityFromRequest(bookRequest, existingBook);
-                    log.info("successful mapping to book");
+                    log.info("successful mapping to book in update");
                     if (bookRequest.getGenreIds() != null) {
                         long existingGenresCount = genreRepository.countByIdIn(bookRequest.getGenreIds());
 
@@ -121,5 +120,91 @@ public class BookServiceImpl implements BookService {
         }
         log.info("not found book by id");
         return false;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookResponse> findByAuthor(String author) {
+        log.info("Start findByAuthor in service");
+        return bookRepository.findByAuthor(author)
+                .stream()
+                .map(bookMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookResponse> findByStatus(BookStatus status) {
+        log.info("Start findByStatus in service");
+        return bookRepository.findByStatus(status)
+                .stream()
+                .map(bookMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookResponse> findByPublicationYear(Integer publicationYear) {
+        log.info("Start findByPublicationYear in service");
+        return bookRepository.findByPublicationYear(publicationYear)
+                .stream()
+                .map(bookMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookResponse> findByPublicationYearBetween(Integer startYear, Integer endYear) {
+        log.info("Start findByPublicationYearBetween in service");
+        return bookRepository.findByPublicationYearBetween(startYear, endYear)
+                .stream()
+                .map(bookMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookResponse> findBooksByGenreId(Long genreId) {
+        log.info("Start findByGenreId in service");
+        return bookRepository.findBooksByGenreId(genreId)
+                .stream()
+                .map(bookMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookResponse> findBooksByGenreName(String name) {
+        log.info("Start findByGenreName in service");
+        return bookRepository.findBooksByGenreName(name)
+                .stream()
+                .map(bookMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookResponse> findPopularBooks() {
+        log.info("Start findByPopularBooks in service");
+        return bookRepository.findPopularBooks()
+                .stream()
+                .map(bookMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookResponse> findBooksWithAverageRatingAbove(Double minRating) {
+        log.info("Start findByAverageRatingAbove in service");
+        return bookRepository.findBooksWithAverageRatingAbove(minRating)
+                .stream()
+                .map(bookMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countByAuthor(String author) {
+        return bookRepository.countByAuthor(author);
     }
 }
