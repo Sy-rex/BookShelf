@@ -12,6 +12,8 @@ import com.sobolev.spring.bookshelf.service.BookService;
 import com.sobolev.spring.bookshelf.util.BookMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,12 +126,10 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookResponse> findByAuthor(String author) {
-        log.info("Start findByAuthor in service");
-        return bookRepository.findByAuthor(author)
-                .stream()
-                .map(bookMapper::toResponse)
-                .collect(Collectors.toList());
+    public Page<BookResponse> findByAuthor(String author, Pageable pageable) {
+        log.info("Searching books by author: {} with pagination: {}", author, pageable);
+        return bookRepository.findByAuthor(author, pageable)
+                .map(bookMapper::toResponse);
     }
 
     @Override

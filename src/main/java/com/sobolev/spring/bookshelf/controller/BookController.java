@@ -2,7 +2,6 @@ package com.sobolev.spring.bookshelf.controller;
 
 import com.sobolev.spring.bookshelf.dto.request.BookRequest;
 import com.sobolev.spring.bookshelf.dto.response.BookResponse;
-import com.sobolev.spring.bookshelf.model.Book;
 import com.sobolev.spring.bookshelf.model.BookStatus;
 import com.sobolev.spring.bookshelf.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,11 +11,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -115,8 +117,11 @@ public class BookController {
             summary = "Get books by author",
             description = "Return book by author"
     )
-    public ResponseEntity<List<BookResponse>> getBooksByAuthor(@PathVariable String author){
-        List<BookResponse> books = bookService.findByAuthor(author);
+    public ResponseEntity<Page<BookResponse>> getBooksByAuthor(@PathVariable String author,
+                                                               @PageableDefault(sort = "publicationYear",
+                                                                       direction = Sort.Direction.DESC) Pageable pageable
+                                                               ){
+        Page<BookResponse> books = bookService.findByAuthor(author, pageable);
         return ResponseEntity.ok(books);
     }
 

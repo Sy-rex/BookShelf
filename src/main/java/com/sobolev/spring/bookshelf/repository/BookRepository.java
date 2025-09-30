@@ -2,6 +2,8 @@ package com.sobolev.spring.bookshelf.repository;
 
 import com.sobolev.spring.bookshelf.model.Book;
 import com.sobolev.spring.bookshelf.model.BookStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +14,7 @@ import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
-    List<Book> findByAuthor(String author);
+    Page<Book> findByAuthor(String author, Pageable pageable);
 
     List<Book> findByAuthorIgnoreCase(String author);
 
